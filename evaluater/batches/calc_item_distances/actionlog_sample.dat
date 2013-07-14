@@ -1,0 +1,10 @@
+#Format
+#user_id,action_id,event_id,rate(only 1)
+hyde,1,sushi,1
+ryo,2,restaurant,1
+hyde,3,bar,1
+alex,4,bar,1
+kevin,5,restaurant,1
+ryo,6,pizza,1
+ryo,7,sushi,1
+alex,8,bar,1

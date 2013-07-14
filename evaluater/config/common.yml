@@ -1,0 +1,6 @@
+action_log_db:
+  num_collections: 100
+
+get_user_action_logs:
+  output_dir: '/home/hidetomo/yama/evaluater/csv/'
+  app_log_path: '/home/hidetomo/yama/evaluater/logs/'
