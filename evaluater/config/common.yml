@@ -1,6 +1,13 @@
 action_log_db:
   num_collections: 100
 
+recommend_data_db:
+  num_collections: 100
+
 get_user_action_logs:
-  output_dir: '/home/hidetomo/yama/evaluater/csv/'
-  app_log_path: '/home/hidetomo/yama/evaluater/logs/'
+  output_dir: '/home/hidetomo/em/evaluater/csv/'
+  app_log_path: '/home/hidetomo/em/evaluater/logs/'
+
+put_event_relation_to_recommend_datadb:
+  app_log_path: '/home/hidetomo/em/evaluater/logs/'
+  input_file_dir: '/home/hidetomo/em/evaluater/csv/'

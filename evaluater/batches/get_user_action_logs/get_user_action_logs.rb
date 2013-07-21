@@ -41,6 +41,7 @@ class GetUserActionLogs
 			@collection.find.each{ |records|
 				records_count += 1
 				writer.write records.values_at("user_id", "action_id", "action_type", "timeslot").join(",")
+				writer.write "\n"
 			}
 			@@app_logger.info "#{Time.now.to_s} current_#{sprintf("%02d", i)} : #{records_count} records"
 		}
