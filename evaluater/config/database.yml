@@ -1,0 +1,14 @@
+# Database Configuration
+user_data:
+  adapter    : mongo
+  #username
+  #password
+  host       : localhost
+  log_path   : '/home/em/evaluater/logs/'
+  log_suffix : '_database.log'
+
+recommend_data:
+  adapter    : mongo
+  host       : localhost
+  log_path   : '/home/em/evaluter/logs/'
+  log_suffix : '_databases.log'

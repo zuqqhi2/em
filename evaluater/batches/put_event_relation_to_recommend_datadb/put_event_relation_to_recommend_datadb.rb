@@ -9,6 +9,8 @@ require 'yaml'
 require 'logger'
 require 'csv'
 
+require File.expand_path(File.dirname(__FILE__) + '../../../lib/models/recommend_data.rb')
+
 class PutEventRelationData
 	def self.setup
 		@@config = YAML::load(File.open(File.expand_path('../../../config/common.yml', __FILE__)))
@@ -17,9 +19,7 @@ class PutEventRelationData
 		@@app_logger = Logger.new(File.open(@@config['put_event_relation_to_recommend_datadb']['app_log_path'] + 'put_event_relation_to_recommend_datadb.log', 'a'))
 		
 		# Connection with mongoDB
-		@conn = Mongo::Connection.new
-		@recommend_datadb = @conn.db('recommend_data')
-		@collection = @recommend_datadb.collection('event_relation_00')
+		@recommend_data = RecommendData.new()
 	end
 
 	def self.process
@@ -36,9 +36,9 @@ class PutEventRelationData
 		filename = File.join(@@config['put_event_relation_to_recommend_datadb']['input_file_dir'], "event_relation_data" + Time.now.strftime("%Y%m%d") + ".csv")
 
 		CSV.open(filename, "r").each do |record|
-			@collection = @recommend_datadb.collection('event_relation_' + sprintf("%02d", get_collection_number(record[0].to_i)))
+			@recommend_data.select_collection('event_relation_' + sprintf("%02d", get_collection_number(record[0].to_i)))
 			doc = {'event_id' => record[0], 'event_genre_id' => record[1], 'target_event_id' => record[2], 'target_event_genre_id' => record[3], 'distance' => record[4], 'timeslot' => record[5], 'created_time' => record[6], 'update_time' => record[7]} 
-			id = @collection.insert(doc)
+			@recommend_data.insert(doc)
 		end
 	end
 
