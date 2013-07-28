@@ -1,0 +1,8 @@
+process.env.NODE_PATH = './node_modules'
+
+cp = require 'child_process'
+
+task 'test', 'run test', ->
+	cp.spawn "mocha"
+		,[ "--compilers","coffee:coffee-script","spec/"]
+		,{ stdio: 'inherit' }
