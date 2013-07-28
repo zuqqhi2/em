@@ -3,12 +3,17 @@
  * GET home page.
  */
 
-exports.index = function(req, res){
-  console.log("Query Parameters");
-	console.log(req.query);
+var requestline = require('../libs/requestline');
 
-  console.log(req.query.uid);
-	
-	//res.json([{ author : 'Audrey Hepburn', text : "Nothing is impossible, the word itself says 'I'm possible'!"}]);
-	res.render('index', { title: 'Express'});
+exports.index = function(req, res){
+	var reqline = new requestline['Requestline'](req.query);
+  console.log("Query Parameters");
+	console.log(reqline.getParams());
+  
+	if (reqline.validate()) {
+		res.json([{ author : 'Audrey Hepburn', text : "Nothing is impossible, the word itself says 'I'm possible'!"}]);
+	} else {
+		res.json({ error : { type : "Qeury Syntax Error", message : "Query Syntax Error"}});
+	}
+	//res.render('index', { title: 'Express'});
 };

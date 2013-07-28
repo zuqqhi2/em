@@ -6,3 +6,9 @@ task 'test', 'run test', ->
 	cp.spawn "mocha"
 		,[ "--compilers","coffee:coffee-script","spec/"]
 		,{ stdio: 'inherit' }
+
+task 'buildmodel', ->
+	cp.spawn "coffee"
+		,[ "-b", "-c","models/"]
+		,[ "-o", "libs/"]
+		,{ stdio: 'inherit' }
