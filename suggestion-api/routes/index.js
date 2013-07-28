@@ -4,5 +4,6 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
+  res.json([{ author : 'Audrey Hepburn', text : "Nothing is impossible, the word itself says 'I'm possible'!"}]);
+	//res.render('index', { title: 'Express' });
 };
