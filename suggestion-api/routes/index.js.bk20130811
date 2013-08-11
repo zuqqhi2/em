@@ -1,0 +1,100 @@
+
+/*
+ * GET home page.
+ */
+
+require('jquery');
+var Step = require('step');
+var requestline = require('../libs/requestline');
+var EventRelation = require('../libs/recommend_data').EventRelation;
+var UserActionLogs = require('../libs/user_action_logs').UserActionLogs;
+
+function sort_items(items){
+	var result = new Array();
+	// copy
+	for (var key in items) {
+		var element = {};
+		element["event_id"] = key;
+		element["genre_id"] = items[key]["genre_id"];
+		element["similarity"] = items[key]["similarity"];
+		result.push(element);
+	}
+	// sort
+	for (var i = 0; i < items.length-1; i++) {
+		for (var j = i+1; j < items.length; j++) {
+			if (result[i]["similarity"] < result[j]["similarity"]) {
+				var tmp = result[i];
+				result[i] = result[j];
+				result[j] = tmp;
+			}
+		}
+	}
+	return result;
+}
+
+function clone(obj) {
+	var f = function(){};
+	f.prototype = obj;
+	return new f;
+}
+
+exports.index = function(req, res){
+	var reqline = new requestline['Requestline'](req.query);
+  console.log("Query Parameters");
+	console.log(reqline.getParams());
+
+	var action_log = new Array();
+
+	var items_tmp = {};
+	var totalsim = {};
+	var counter = {};
+
+	// Get user action logs
+	UserActionLogs.find({user_id:parseInt(reqline.getParams()['uid'])}, function(err, action_logs) {
+
+		// Make unique event_id list with the specified user
+		var event_list = new Array();
+		for (var i = 0; i < action_logs.length; i++) {
+			if (event_list.indexOf(action_logs[i]['event_id']) == -1) {
+				event_list.push(action_logs[i]['event_id']);
+			}
+		}		
+
+		// Get similarities between events
+		EventRelation.find({timeslot:reqline.getParams()['timeslot']}, function(err, items) {	
+			
+			for (var i = 0; i < items.length; i++) {
+				if (parseInt(items[i]["target_event_id"]) in items_tmp) {
+					items_tmp[parseInt(items[i]["target_event_id"])]["similarity"] += parseFloat(items[i]["distance"]);
+					counter[parseInt(items[i]["target_event_id"])] += 1;
+				} else {
+					items_tmp[parseInt(items[i]["target_event_id"])] = {};
+					items_tmp[parseInt(items[i]["target_event_id"])]["genre_id"] = parseInt(items[i]["target_event_genre_id"]);
+					items_tmp[parseInt(items[i]["target_event_id"])]["similarity"] = parseFloat(items[i]["distance"]);
+					counter[parseInt(items[i]["target_event_id"])] = 1;
+				}
+	
+				if (parseInt(items[i]["target_event_id"]) in totalsim) {
+					totalsim[parseInt(items[i]["target_event_id"])] += parseFloat(items[i]["distance"]);
+				} else {
+					totalsim[parseInt(items[i]["target_event_id"])] = parseFloat(items[i]["distance"]);
+				}
+			}
+	
+			/* normalize */
+			for (var key in items_tmp) {
+				items_tmp[key]["similarity"] = items_tmp[key]["similarity"] / counter[key];
+				//items_tmp[key]["similarity"] = items_tmp[key]["similarity"] / totalsim[key];
+			}
+
+			var recommended_items = sort_items(items_tmp);  
+
+			if (reqline.validate()) {
+				res.json(recommended_items);
+			} else {
+				res.json({ error : { type : "Qeury Syntax Error", message : "Query Syntax Error"}});
+			}
+		});
+	});
+	//res.render('index', { title: 'Express'});
+};
