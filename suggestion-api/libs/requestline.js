@@ -6,7 +6,7 @@ Requestline = (function() {
     this.params = params;
     this.validator = {
       "uid": /^[0-9]+$/,
-      "timeslot": /^[0-2][0-9]-[0-2][0-9]$/
+      "timeslot": /^[0-2][0-9]:[0-5][0-9]-[0-2][0-9]:[0-5][0-9]$/
     };
   }
 

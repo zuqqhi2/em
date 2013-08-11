@@ -1,13 +1,7 @@
-
-/*
- * GET home page.
- */
-
 require('jquery');
 var Step = require('step');
 var requestline = require('../libs/requestline');
-var mongo = require('../libs/recommend_data');
-var EventRelation = mongo.EventRelation;
+var UserEventSim = require('../libs/user_event_similarites').UserEventSim;
 
 function sort_items(items){
 	var result = new Array();
@@ -38,37 +32,33 @@ function clone(obj) {
 	return new f;
 }
 
+/**
+ * Entry point
+ */
 exports.index = function(req, res){
 	var reqline = new requestline['Requestline'](req.query);
   console.log("Query Parameters");
 	console.log(reqline.getParams());
 
-	var action_log = new Array();
-	action_log.push(599);
-	action_log.push(600);
+	var uid = parseInt(reqline.getParams()['uid']);
+	var tslot = reqline.getParams()['timeslot'];
 
-	var items_tmp = {};
-	EventRelation.find({timeslot:reqline.getParams()['timeslot']}, function(err, items) {
-		var sim = 0.0;
-		var totalsim = 0.0;
+	// If request line has syntax error, error message should be shown
+	if (!reqline.validate()) {
+			res.json({ error : { type : 1, message : "Query Syntax Error"}});
+	} else {
+		// Get recommended data
+		UserEventSim.find({user_id:uid,timeslot:tslot},
+											{"_id":0,"event_id":1,"genre_id":1,"title":1,"description":1,"imageurl":1})
+								.sort({similarity: -1})
+								.execFind(function(err,items){
+			
+			console.log(items);
+		
+			var formatted_items = {"response_type":1, "recommend_events":items};
 
-		for (var i = 0; i < items.length; i++) {
-			if (parseInt(items[i]["target_event_id"]) in items_tmp) {
-				items_tmp[parseInt(items[i]["target_event_id"])]["similarity"] += parseFloat(items[i]["distance"]);
-			} else {
-				items_tmp[parseInt(items[i]["target_event_id"])] = {};
-				items_tmp[parseInt(items[i]["target_event_id"])]["genre_id"] = parseInt(items[i]["target_event_genre_id"]);
-				items_tmp[parseInt(items[i]["target_event_id"])]["similarity"] = parseFloat(items[i]["distance"]);
-			}
-		}
-	
-		var recommended_items = sort_items(items_tmp);  
-
-		if (reqline.validate()) {
-			res.json(recommended_items);
-		} else {
-			res.json({ error : { type : "Qeury Syntax Error", message : "Query Syntax Error"}});
-		}
-	});
+			res.json(formatted_items);
+		});
+	}
 	//res.render('index', { title: 'Express'});
 };
