@@ -15,6 +15,7 @@
 		"mongoose": "*",
 		"cheerio": "*",
 		"twitter": "*",
-		"yaml": "*"
+		"yaml": "*",
+		"log4js": "*"
   }
 }

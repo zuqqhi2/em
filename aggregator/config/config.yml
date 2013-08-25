@@ -2,3 +2,8 @@ tabelog_api:
  api_key: "8abec40c3ef0b7b6faf4aa2db0a710837564e4ea"
  base_url: "http://api.tabelog.com/Ver2.1/RestaurantSearch/"
 
+event_db:
+ host: "localhost"
+ event_data: "event_data"
+ genre_info: "genre_info"
+
